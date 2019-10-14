@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -27,8 +28,9 @@ func main() {
 	i := rng.Intn(len(pokemon)-1)
 
 	p := pokemon[i]
-	fmt.Println("A wild " + p.Pokemon + " appeared!")
 	fmt.Println(p.Say)
+
+	printMessage(p.Pokemon)
 }
 
 func parseJson() ([]Pokemon, error) {
@@ -49,4 +51,13 @@ func parseJson() ([]Pokemon, error) {
 func createRng() *rand.Rand {
 	src := rand.NewSource(time.Now().UnixNano())
 	return rand.New(src)
+}
+
+func printMessage(name string) {
+	l := len(name) + 31
+	fmt.Println("+" + strings.Repeat("-", l) + "+")
+	fmt.Println("|"+ strings.Repeat(" ", l) + "|")
+	fmt.Println("|       A wild " + name + " appeared!       |")
+	fmt.Println("|"+ strings.Repeat(" ", l) + "|")
+	fmt.Println("+" + strings.Repeat("-", l) + "+")
 }
