@@ -1,8 +1,11 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/maxtaylordavies/gokesay/config"
+	"github.com/gobuffalo/packr/v2"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -10,13 +13,6 @@ import (
 	"strings"
 	"time"
 )
-
-type Pokemon struct {
-	Number int `json:"number"`
-	Pokemon string `json:"pokemon"`
-	Form string `json:"form,omitempty"`
-	Say string `json:"say"`
-}
 
 func main() {
 	pokemon, err := parseJson()
@@ -28,21 +24,15 @@ func main() {
 	i := rng.Intn(len(pokemon)-1)
 
 	p := pokemon[i]
-	fmt.Println(p.Say)
-
+	display(p.Say)
 	printMessage(p.Pokemon)
 }
 
-func parseJson() ([]Pokemon, error) {
-	var pokemon []Pokemon
+func parseJson() ([]config.Pokemon, error) {
+	var pokemon []config.Pokemon
 
-	f, err := os.Open("pokemon.json")
-	if err != nil {
-		return pokemon, err
-	}
-	defer f.Close()
-
-	b, _ := ioutil.ReadAll(f)
+	box := packr.New("StaticBox", "./static")
+	b, err := box.Find("pokemon.json")
 	err = json.Unmarshal(b, &pokemon)
 
 	return pokemon, err
@@ -61,3 +51,37 @@ func printMessage(name string) {
 	fmt.Println("|"+ strings.Repeat(" ", l) + "|")
 	fmt.Println("+" + strings.Repeat("-", l) + "+")
 }
+
+func display(img string) {
+	fmt.Print("\033]1337;")
+	fmt.Printf("File=inline=1")
+	fmt.Print(";width=50")
+	fmt.Print(";height=50")
+	fmt.Print(":")
+	fmt.Print(img)
+	fmt.Print("\a\n")
+}
+
+func printPng(fn string) {
+	r, err := os.Open(fn)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Print("\033]1337;")
+	fmt.Printf("File=inline=1")
+	fmt.Print(";width=50")
+	fmt.Print(";height=50")
+	fmt.Print(":")
+	fmt.Printf("%s", base64.StdEncoding.EncodeToString(data))
+	fmt.Print("\a\n")
+}
+
+
+
+
